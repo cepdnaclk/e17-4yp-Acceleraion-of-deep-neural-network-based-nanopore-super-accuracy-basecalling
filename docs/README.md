@@ -19,7 +19,7 @@ title:
 
 #### Supervisors
 
-- Prof. roshan Ragel, [email](mailto:roshanr@eng.pdn.ac.lk)
+- Prof. Roshan Ragel, [email](mailto:roshanr@eng.pdn.ac.lk)
 - Dr. Damayanthi Herath, [email](mailto:damayanthiherath@eng.pdn.ac.lk)
 - Dr. Hasindu Gamarachchi, [email](mailto:hasindu@unsw.edu.au)
 
@@ -43,7 +43,28 @@ This is a sample image, to show how to add images to your page. To learn more op
 
 ## Abstract
 
+Nanopore sequencing is a technique that is used to real-time analyze long DNA and RNA fragments which is being rapidly adopted in genomics. Monitoring changes in an electric current passing through a protein nanopore (a nanopore is a nano-size pore or cavity) as a nucleic acid and using the resulting signals to identify specific DNA or RNA fragments are the working principles of the Nanopore sequencing. Although it can be used to get real-time data sequencing which provides immediate access to the results, There are challenges in the data processing or the computational analysis side of nanopore sequencing due to the large volume of data and, the amount of computational resources required making the current basecalling implementation that uses GPUs requires few days.
+
 ## Related works
+
+There are few areas which have related works on Naanopore sequencing.
+
+* Data compression techniques
+* Techniques related to the file format for handling nanopore data
+* Machine Learning techniques
+
+1. Impact of lossy compression of nanopore raw signal data on basecalling and consensus accuracy
+
+This rsearch has been focused on the first area in which researchers have explored the use of lossy compression for nanopore raw data using two state-of-the-art lossy time-series compressors, and evaluate the tradeoff between compressed size and basecalling/consensus accuracy. 
+
+According to the conclusion of the research, they have found that lossy compression with existing tools can reduce the compressed size by 35–50% over lossless compression with less than 0.2% percent reduction in basecalling accuracy.
+
+2. Flexible and efcient handling of nanopore sequencing signal data with slow5tools
+
+This research has been focused on the second topic where researchers have done a good experiment on introducing a new file format called slow5 for handling nanopore data.
+
+3. Fast nanopore sequencing data analysis with SLOW5
+
 
 ## Methodology
 
