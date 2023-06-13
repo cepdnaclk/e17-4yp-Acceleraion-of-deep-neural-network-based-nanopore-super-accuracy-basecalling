@@ -47,7 +47,7 @@ Nanopore sequencing is a technique that is used to real-time analyze long DNA an
 
 ## Related works
 
-There are few areas which have related works on Naanopore sequencing.
+There are few areas which have related works on Nanopore sequencing.
 
 * Data compression techniques
 * Techniques related to the file format for handling nanopore data
@@ -65,7 +65,21 @@ This research has been focused on the second topic where researchers have done a
 
 3. Fast nanopore sequencing data analysis with SLOW5
 
+4. Beyond sequencing: machine learning algorithms extract biology hidden in Nanopore signal data
 
+This review paper has been focused on discussing machine learning applications on nanopore sequencing. Other than sequencing genomes and transcriptomes, this paper discusses on
+    * extracting biological information from these signals allow the detection of DNA and RNA modifications
+    * estimation of poly(A) tail length
+    * prediction of RNA secondary structures
+
+    basecalling :
+    Basecalling is a crucial step in nanopore sequencing, where raw ion current signal data is converted into a sequence of bases. The ion current signal represents the measured changes in current as a nucleic acid molecule translocates through a nanopore. The challenge lies in accurately determining the corresponding k-mers (sequences of five bases for RNA or six bases for DNA) based on the noisy signal data. This difficulty is amplified by the presence of homopolymers, where multiple k-mers share similar ion current signal ranges.
+
+    Early basecalling methods typically achieved an accuracy of 85% or lower. Since then, significant advancements have been made in basecalling algorithms to improve nanopore sequencing accuracy. These improvements have been a driving force in achieving over 98.3% accuracy in correctly identifying bases.
+
+    Hidden Markov model-based basecallers, such as ONT's Metrichor and Nanocall, use a hidden Markov model (HMM) to decode the signal data in nanopore sequencing. These basecallers consider the ion current signals as observable events and the k-mers as states within the HMM.
+
+    HMM basecallers have limitations in predicting sequences in nanopore sequencing due to their focus on short-range dependencies between k-mers. They may not account for long-range dependencies effectively. Additionally, inaccuracies in the nucleotide sequence model describing the expected current values of k-mers can introduce biases in HMM basecallers. To address these constraints, basecalling tools like Albacore, nanonetvi, DeepNano, and BasecRAWller utilize a recurrent neural network (RNN) framework. This approach helps overcome the limitations of HMM basecallers by leveraging the capabilities of RNNs to capture and model both short-range and long-range dependencies in the data.
 ## Methodology
 
 ## Experiment Setup and Implementation
