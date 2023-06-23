@@ -46,6 +46,44 @@ This is a sample image, to show how to add images to your page. To learn more op
 Nanopore sequencing is a technique that is used to real-time analyze long DNA and RNA fragments which is being rapidly adopted in genomics. Monitoring changes in an electric current passing through a protein nanopore (a nanopore is a nano-size pore or cavity) as a nucleic acid and using the resulting signals to identify specific DNA or RNA fragments are the working principles of the Nanopore sequencing. Although it can be used to get real-time data sequencing which provides immediate access to the results, There are challenges in the data processing or the computational analysis side of nanopore sequencing due to the large volume of data and, the amount of computational resources required making the current basecalling implementation that uses GPUs requires few days.
 
 ## Related works
+DNA sequencing plays a crucial role in molecular biology, enabling scientists to determine the precise order of nucleotides (adenine, cytosine, guanine, and thymine) within a DNA molecule. This technology has revolutionized fields like genetics, genomics, and personalized medicine by providing valuable insights into the genetic makeup of organisms. Nanopore sequencing, a technique used for real-time analysis of long DNA and RNA fragments, has emerged as a powerful tool in genomics. However, the processing and analysis of large datasets pose significant challenges in nanopore sequencing data analysis. In this article, we will explore the challenges involved and the solutions researchers are developing to accelerate the analysis of nanopore sequencing data.
+
+#### Challenges in Nanopore Sequencing Data Analysis
+
+Nanopore sequencing presents several challenges that need to be addressed for efficient data analysis:
+
+1. Handling Large Datasets: Nanopore sequencing generates enormous amounts of raw signal data, which requires efficient algorithms and computational techniques to process and analyze effectively.
+
+2. Pre-processing Steps: Raw data from nanopore sequencing undergoes pre-processing steps, including signal calibration, noise reduction, and quality filtering, before further analysis.
+
+3. Basecalling: Basecalling is a critical step in nanopore sequencing that converts raw electrical signals into DNA bases. The noisy nature of the signal makes achieving accurate results computationally demanding.
+
+### Oxford Nanopore Sequencing
+
+Oxford Nanopore sequencing, developed by Oxford Nanopore Technologies, is an innovative next-generation DNA and RNA sequencing technology that has gained significant attention in the scientific community. It utilizes nanopore-based sensing to analyze DNA or RNA molecules, offering several unique features.
+
+The working principle of Oxford Nanopore sequencing involves preparing the DNA sample by fragmenting it into smaller pieces and attaching adapters to facilitate attachment to the nanopore sequencing device. The device contains an array of nanopores, tiny protein channels embedded in a membrane. As individual DNA strands pass through the nanopore, they cause disruptions in the electrical current, which are detected and recorded. Changes in the electrical current are measured and converted into signals, allowing for the determination of base sequences.
+
+The collected electrical signals are processed using specialized software, which compares them to a reference genome and reconstructs the original DNA sequence. The resulting DNA sequence can be further analyzed for various applications such as identifying genetic variations, studying gene expression levels, detecting epigenetic modifications, and detecting structural variations. Additionally, Oxford Nanopore sequencing allows for metagenomic analysis, long-range genomic analysis, and transcriptome assembly.
+Advantages of Oxford Nanopore Sequencing
+
+Oxford Nanopore sequencing offers several advantages compared to other sequencing technologies:
+
+1. Real-Time Sequencing: Oxford Nanopore sequencing provides real-time sequencing data, allowing researchers to observe the results immediately and make rapid decisions during the sequencing process.
+
+2. Long Read Lengths: This technology produces long sequencing reads, enabling genome assembly, resolving complex genomic regions, and detecting structural variants.
+
+3. Portable and Flexible Instruments: Oxford Nanopore sequencing platforms, such as MinION and GridION, are portable, compact, and suitable for on-site or point-of-care applications. The modular nature of the platform allows for scalability and flexibility in throughput and data production.
+
+4. Direct DNA/RNA Sequencing: Unlike other sequencing technologies, Oxford Nanopore sequencing enables direct sequencing of native DNA or RNA molecules without additional amplification or synthesis steps, reducing potential biases and artifacts.
+
+5. Broad Range of Applications: Oxford Nanopore sequencing is applicable to various research areas, including whole-genome sequencing, transcriptomics, metagenomics, epigenetics, and real-time monitoring of DNA or RNA modifications.
+
+6. Cost-Effective: Oxford Nanopore sequencing offers competitive pricing and cost-effective sequencing of small to large genomes
+
+However, nanopore sequencing faces limitations in terms of computational resources. Processing the sequencing data can be time-consuming, limiting scalability and efficiency. To address these challenges, researchers are exploring approaches such as algorithmic optimizations, parallel computing, and hardware accelerators to accelerate data processing and analysis, reduce processing time, and improve accessibility and cost-effectiveness.
+
+In summary, Oxford Nanopore sequencing is a powerful tool that offers real-time sequencing, long read lengths, portability, and a broad range of applications. Despite computational limitations, ongoing advancements aim to enhance the technology and unleash its full potential in genomic research and analysis.
 
 There are few areas which have related works on Nanopore sequencing.
 
@@ -80,6 +118,7 @@ This review paper has been focused on discussing machine learning applications o
     Hidden Markov model-based basecallers, such as ONT's Metrichor and Nanocall, use a hidden Markov model (HMM) to decode the signal data in nanopore sequencing. These basecallers consider the ion current signals as observable events and the k-mers as states within the HMM.
 
     HMM basecallers have limitations in predicting sequences in nanopore sequencing due to their focus on short-range dependencies between k-mers. They may not account for long-range dependencies effectively. Additionally, inaccuracies in the nucleotide sequence model describing the expected current values of k-mers can introduce biases in HMM basecallers. To address these constraints, basecalling tools like Albacore, nanonetvi, DeepNano, and BasecRAWller utilize a recurrent neural network (RNN) framework. This approach helps overcome the limitations of HMM basecallers by leveraging the capabilities of RNNs to capture and model both short-range and long-range dependencies in the data.
+
 ## Methodology
 
 ## Experiment Setup and Implementation
