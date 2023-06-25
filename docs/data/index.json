@@ -23,11 +23,11 @@
         },
         {
             "name": "Dr. Damayanthi Herath",
-            "email": "damayanthi@eng.pdn.ac.lk"
+            "email": "damayanthiherath@eng.pdn.ac.lk"
         },
         {
             "name": "Dr. Hasindu Gamarachchi",
-            "email": ""
+            "email": "h.gamaarachchi@garvan.org.au"
         }
     ],
     "media": [
@@ -37,5 +37,5 @@
             "url": "#"
         }
     ],
-    "tags": ["Final Year Projects"]
+    "tags": ["Final Year Projects", "DNA sequencing", "Super accuracy basecalling", "Accelerated Computing", "Oxford Nanopore"]
 }
