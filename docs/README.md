@@ -208,21 +208,36 @@ efficiency of basecalling in nanopore sequencing.
 
 ## Methodology
 
+1. Understand the codebase
+2. Find the bottlenecks using timestamps
+3. Research on optimising the bottlenecks
+4. Test for the performance improvement & Accuracy 
+
+
 ## Experiment Setup and Implementation
 
+Contiguous Memory Allocation of RNN Weights and matrix multiplication are the main bottlenecks.
+
+1. Optimizing Contiguous Memory Allocation of RNN Weights
+2. Optimizing Large matrix multiplication
+
+Winograd's matrix multiplication code was implemented in CUDA utilizing Cublas functions for basic matrix algebra kernels.
+
 ## Results and Analysis
+
+Current progress : ~52% performance improvement by optimizing Contiguous Memory Allocation of RNN Weights
+
 
 ## Conclusion
 
 ## Publications
-## Publications
 [//]: # "Note: Uncomment each once you uploaded the files to the repository"
 
 1. [Semester 7 report](https://www.overleaf.com/read/xrxwntnvjvzw)
-2. [Semester 7 slides]()
+2. [Semester 7 slides](https://docs.google.com/presentation/d/1dHEG9yFM64_zesxkOAz7Bek2ve_-AykZds2fYHVTiZQ/edit?usp=sharing)
 3. [Semester 8 report]() 
-4. [Semester 8 slides]()
-5. [Semester 8 3MT slides]()
+4. [Semester 8 mid presentation slides](https://docs.google.com/presentation/d/1B0t23Atwd4plcLOh9_XFJz47RPqVpAGk/edit?usp=sharing&ouid=104472781387848199298&rtpof=true&sd=true)
+5. [Semester 8 end presentation slides]()
 <!-- 5. Author 1, Author 2 and Author 3 "Research paper title" (2021). [PDF](./). -->
 
 
