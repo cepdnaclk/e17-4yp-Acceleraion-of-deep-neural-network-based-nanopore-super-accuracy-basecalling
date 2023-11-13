@@ -9,7 +9,7 @@ title:
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
 
-# Acceleration of deep neural network based nanopore super accuracy basecalling
+## Acceleration of deep neural network based nanopore super accuracy basecalling
 
 #### Team
 
@@ -35,11 +35,13 @@ title:
 8. [Links](#links)
 
 ---
-## Abstract
+### Abstract
 
 Nanopore sequencing is a technique that is used to real-time analyze long DNA and RNA fragments which is being rapidly adopted in genomics. Monitoring changes in an electric current passing through a protein nanopore (a nanopore is a nano-size pore or cavity) as a nucleic acid and using the resulting signals to identify specific DNA or RNA fragments are the working principles of the Nanopore sequencing. Although it can be used to get real-time data sequencing which provides immediate access to the results, There are challenges in the data processing or the computational analysis side of nanopore sequencing due to the large volume of data and, the amount of computational resources required making the current basecalling implementation that uses GPUs requires few days.
 
-## Related works
+
+
+### Motivation
 DNA sequencing plays a crucial role in molecular biology, enabling scientists to determine the precise order of nucleotides (adenine, cytosine, guanine, and thymine) within a DNA molecule. This technology has revolutionized fields like genetics, genomics, and personalized medicine by providing valuable insights into the genetic makeup of organisms. Nanopore sequencing, a technique used for real-time analysis of long DNA and RNA fragments, has emerged as a powerful tool in genomics. However, the processing and analysis of large datasets pose significant challenges in nanopore sequencing data analysis. In this article, we will explore the challenges involved and the solutions researchers are developing to accelerate the analysis of nanopore sequencing data.
 
 #### Challenges in Nanopore Sequencing Data Analysis
@@ -52,14 +54,16 @@ Nanopore sequencing presents several challenges that need to be addressed for ef
 
 3. Basecalling: Basecalling is a critical step in nanopore sequencing that converts raw electrical signals into DNA bases. The noisy nature of the signal makes achieving accurate results computationally demanding.
 
-### Oxford Nanopore Sequencing
+#### Oxford Nanopore Sequencing
 
 Oxford Nanopore sequencing, developed by Oxford Nanopore Technologies, is an innovative next-generation DNA and RNA sequencing technology that has gained significant attention in the scientific community. It utilizes nanopore-based sensing to analyze DNA or RNA molecules, offering several unique features.
 
 The working principle of Oxford Nanopore sequencing involves preparing the DNA sample by fragmenting it into smaller pieces and attaching adapters to facilitate attachment to the nanopore sequencing device. The device contains an array of nanopores, tiny protein channels embedded in a membrane. As individual DNA strands pass through the nanopore, they cause disruptions in the electrical current, which are detected and recorded. Changes in the electrical current are measured and converted into signals, allowing for the determination of base sequences.
 
 The collected electrical signals are processed using specialized software, which compares them to a reference genome and reconstructs the original DNA sequence. The resulting DNA sequence can be further analyzed for various applications such as identifying genetic variations, studying gene expression levels, detecting epigenetic modifications, and detecting structural variations. Additionally, Oxford Nanopore sequencing allows for metagenomic analysis, long-range genomic analysis, and transcriptome assembly.
-Advantages of Oxford Nanopore Sequencing
+
+
+#### Advantages of Oxford Nanopore Sequencing
 
 Oxford Nanopore sequencing offers several advantages compared to other sequencing technologies:
 
@@ -79,11 +83,17 @@ However, nanopore sequencing faces limitations in terms of computational resourc
 
 In summary, Oxford Nanopore sequencing is a powerful tool that offers real-time sequencing, long read lengths, portability, and a broad range of applications. Despite computational limitations, ongoing advancements aim to enhance the technology and unleash its full potential in genomic research and analysis.
 
-There are few areas which have related works on Nanopore sequencing.
+
+<details>
+  <summary>Related Works
+  
+  There are few areas which have related works on Nanopore sequencing.
 
 * Data compression techniques
 * Techniques related to the file format for handling nanopore data
-* Machine Learning techniques
+* Deep learning related improvements
+* Hardware Acceleration
+  </summary>
 
 1. Impact of lossy compression of nanopore raw signal data on basecalling and consensus accuracy
 
@@ -206,43 +216,207 @@ together to form the final complete sequence. By eliminating
 the need for segmentation, Chiron improves the accuracy and
 efficiency of basecalling in nanopore sequencing.
 
-## Methodology
+</details>
+
+### Methodology
 
 1. Understand the codebase
 2. Find the bottlenecks using timestamps
 3. Research on optimising the bottlenecks
 4. Test for the performance improvement & Accuracy 
 
+### Scope
 
-## Experiment Setup and Implementation
+Acceleration of Slorado basecaller with memory utilization and algorithmic optimization
+
+### Experiment Setup and Implementation
 
 Contiguous Memory Allocation of RNN Weights and matrix multiplication are the main bottlenecks.
 
 1. Optimizing Contiguous Memory Allocation of RNN Weights
 2. Optimizing Large matrix multiplication
 
-Winograd's matrix multiplication code was implemented in CUDA utilizing Cublas functions for basic matrix algebra kernels.
+Winograd's matrix multiplication code was implemented in CUDA to replace current matrix multiplication function utilizing Cublas functions for basic matrix algebra kernels. The reason is to select winograd algorithm is the lowest time complexity it has among other matrix multiplication algorithms. 
 
-## Results and Analysis
+<details>
+  <summary>Winograd matrix multiplication algorithm
+  </summary>
+
+parameters: A=Tensor A, B=Tensor B, C=Tensor C
+
+Execution Steps:
+1) Calculate width and height values of sub-matrices
+int rowsA = A.size(0);
+int colsA = A.size(1);
+int rowsB = B.size(0);
+int colsB = B.size(1);
+int subRowsA=rowsA/2;
+int subColsA=colsA/2;
+int subRowsB=rowsB/2;
+int subColsB=colsB/2;
+2) Allocate space in global memory for each of the
+sub-matrices such that (subRowsA* subColsA *
+sizeof(float)) is allocated for A11, A12, A21, A22 and
+(subRowsB* subColsB * sizeof(float)) for B11, B12,
+B21, B22
+3) Set sub-matrices
+4) Allocate space in global memory for intermediate
+matrices S1, S2, S3, S4, S5, S6, S7, S8, m1, m2, m3,
+m4, m5, m6, m7
+5) Calculate S1=A21+A22, S2=S1-A11, S3=A11+A21,
+S4=A12- S2, S5=B12-B11, S6=B22-S5,S7=B22-
+B12,S8=S6-B21
+6) if (rowsA <= BLOCK_THRESHOLD) then Calculate
+m1=S2*S6 , m2=A11*B11, m3=A12*B21, m4=S3*S7,
+m5=S1*S5, m6=S4*B22, m7=A22*S8
+7) else
+Call winograd_mm(S2, S6, m1)
+Call winograd_mm(A11, B11, m2)
+Call winograd_mm(A12, B21, m3)
+Call winograd_mm(S3, S7, m4)
+Call winograd_mm(S1, S5, m5)
+Call winograd_mm(S4, B22, m6)
+Call winograd_mm(A22, S8, m7)
+8) Synchronize all threads
+9) Caculate C11=M2+M3, C12=M1+M2+M5+M6,
+C21=M1+M2+M4-M7, C22=M1+M2+M4+M5
+10) Merge C11, C12, C21, and C22 into output matrix C
+11) Convert matrix C into a Tensor
+12) Free all allocated global memory
+</details>
+<details>
+  <summary> CUDA device functions for compute C11, C12, C21, C22 and C</summary>
+
+``````
+__global__ void computeC12 (float* C, float* m1 ,float* m2 ,float* m5 ,float* m6 , int subWidth)
+{
+
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+
+    int row = blockIdx.y * TILE_Y + ty;
+    int column = blockIdx.x * TILE_X + tx;
+
+    __shared__ float as[ TILE_Y ][ TILE_X ];
+    /* This line declares a shared memory array 'as' with dimensions TILE_Y by TILE_X. Shared memory is used for cooperative thread block-level data sharing.*/
+    float Csub ; /*to store the intermediate sum.*/
+
+    as[ty ][ tx ]= m1 [( row )* subWidth + column ];
+    Csub =as[ty ][ tx ];
+    as[ty ][ tx ]= m2 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    as[ty ][ tx ]= m5 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    as[ty ][ tx ]= m6 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    C[( row )* subWidth + column ]= Csub;
+
+}
+``````
+
+``````
+__global__ void computeC11 (float* C,float* m2 ,float* m3, int subWidth)
+{
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+
+    int row = blockIdx.y * TILE_Y + ty;
+    int column = blockIdx.x * TILE_X + tx;
+
+    __shared__ float as[ TILE_Y ][ TILE_X ];
+    float Csub;
+
+    as[ty ][ tx ]= m2 [( row )* subWidth + column ];
+    Csub =as[ty ][ tx ];
+    as[ty ][ tx ]= m3 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    C[( row )* subWidth + column ]= Csub;
+
+}
+
+``````
+``````
+__global__ void computeC22 (float* C,float* m1,float* m2, float* m4, float* m5, int subWidth)
+{
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+    int row = blockIdx.y * TILE_Y + ty;
+    int column = blockIdx.x * TILE_X + tx;
+    __shared__ float as[ TILE_Y ][ TILE_X ];
+    float Csub ;
+
+    as[ty ][ tx ]= m1 [( row )* subWidth + column ];
+    Csub =as[ty ][ tx ];
+    as[ty ][ tx ]= m2 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    as[ty ][ tx ]= m4 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    as[ty ][ tx ]= m5 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    C[( row )* subWidth + column ]= Csub;
+
+}
+
+``````
+``````
+__global__ void computeC21 (float* C,float* m1, float* m2, float* m4, float* m7, int subWidth ){
+
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+
+    int row = blockIdx.y * TILE_Y + ty;
+    int column = blockIdx.x * TILE_X + tx;
+    __shared__ float as[ TILE_Y ][ TILE_X ];
+    float Csub ;
+
+    as[ty ][ tx ]= m1 [( row )* subWidth + column ];
+    Csub =as[ty ][ tx ];
+    as[ty ][ tx ]= m2 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    as[ty ][ tx ]= m4 [( row )* subWidth + column ];
+    Csub += as[ty ][ tx ];
+    as[ty ][ tx ]= m7 [( row )* subWidth + column ];
+    Csub -= as[ty ][ tx ];
+    C[( row )* subWidth + column ]= Csub;
+
+}
+
+``````
+``````
+__global__ void mergeSubmatrices(float* submatrix0, float* submatrix1, float* submatrix2, float* submatrix3, float* finalMatrix,int N, int M)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+
+    finalMatrix[y * M + x] = submatrix0[y * N + x];
+    finalMatrix[y * M + x + N] = submatrix1[y * N + x];
+    finalMatrix[(y + N) * M + x] = submatrix2[y * N + x];
+    finalMatrix[(y + N) * M + x + N] = submatrix3[y * N + x];
+}
+``````
+
+</details>
+
+### Results and Analysis
 
 Current progress : ~52% performance improvement by optimizing Contiguous Memory Allocation of RNN Weights
 
 
-## Conclusion
+### Conclusion
 
-## Publications
+### Publications
 [//]: # "Note: Uncomment each once you uploaded the files to the repository"
 
 1. [Semester 7 report](https://www.overleaf.com/read/xrxwntnvjvzw)
 2. [Semester 7 slides](https://docs.google.com/presentation/d/1dHEG9yFM64_zesxkOAz7Bek2ve_-AykZds2fYHVTiZQ/edit?usp=sharing)
-3. [Semester 8 report]() 
+3. [Semester 8 report](https://www.overleaf.com/read/pbsgyfsfshbf#30d8c6) 
 4. [Semester 8 mid presentation slides](https://docs.google.com/presentation/d/1B0t23Atwd4plcLOh9_XFJz47RPqVpAGk/edit?usp=sharing&ouid=104472781387848199298&rtpof=true&sd=true)
-5. [Semester 8 end presentation slides]()
+5. [Semester 8 end presentation slides](https://docs.google.com/presentation/d/1QYtur04M6fK93ZOTVnGnpxzGpuMdrz8s/edit?usp=sharing&ouid=104472781387848199298&rtpof=true&sd=true)
 <!-- 5. Author 1, Author 2 and Author 3 "Research paper title" (2021). [PDF](./). -->
 
 
 
-## Links
+### Links
 
 [//]: # ( NOTE: EDIT THIS LINKS WITH YOUR REPO DETAILS )
 
