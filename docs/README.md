@@ -35,11 +35,15 @@ title:
 8. [Links](#links)
 
 ---
+<div style="background-color:rgba(255, 255, 255, 0.0470588); text-align:justify; vertical-align: middle; padding:40px 20px; text-color:white">
+
 ### Abstract
 
-Nanopore sequencing is a technique that is used to real-time analyze long DNA and RNA fragments which is being rapidly adopted in genomics. Monitoring changes in an electric current passing through a protein nanopore (a nanopore is a nano-size pore or cavity) as a nucleic acid and using the resulting signals to identify specific DNA or RNA fragments are the working principles of the Nanopore sequencing. Although it can be used to get real-time data sequencing which provides immediate access to the results, There are challenges in the data processing or the computational analysis side of nanopore sequencing due to the large volume of data and, the amount of computational resources required making the current basecalling implementation that uses GPUs requires few days.
+Nanopore sequencing is a technique that is used to real-time analyze long DNA and RNA fragments which is being rapidly adopted in genomics. Monitoring changes in an electric current passing through a protein nanopore (a nanopore is a nano-size pore or cavity) as a nucleic acid and using the resulting signals to identify specific DNA or RNA fragments are the working principles of the Nanopore sequencing. Although it can be used to get real-time data sequencing which provides immediate access to the results, There are challenges in the data processing due to the large volume of data and, the amount of computational resources required making the current basecalling implementation that uses GPUs requires few days. Within the scope of the research we focused on accelerating 'Slorado' basecaller considering memory utilization and algorithmic optimization. By optimizing contiguos memory allocation of RNN weights ~52% acceleration was achieved and then we investigated the applicability of winograd algorithm based tiled matrix multiplication to improve the matrix multiplication and therewe found that winograd based tiled matrix multiplication can not outperform current cublasGemmEx maxtrix multiplication function.
 
+</div>
 
+---
 
 ### Motivation
 DNA sequencing plays a crucial role in molecular biology, enabling scientists to determine the precise order of nucleotides (adenine, cytosine, guanine, and thymine) within a DNA molecule. This technology has revolutionized fields like genetics, genomics, and personalized medicine by providing valuable insights into the genetic makeup of organisms. Nanopore sequencing, a technique used for real-time analysis of long DNA and RNA fragments, has emerged as a powerful tool in genomics. However, the processing and analysis of large datasets pose significant challenges in nanopore sequencing data analysis. In this article, we will explore the challenges involved and the solutions researchers are developing to accelerate the analysis of nanopore sequencing data.
@@ -89,10 +93,11 @@ In summary, Oxford Nanopore sequencing is a powerful tool that offers real-time 
   
   There are few areas which have related works on Nanopore sequencing.
 
-* Data compression techniques
-* Techniques related to the file format for handling nanopore data
-* Deep learning related improvements
-* Hardware Acceleration
+1. Data compression techniques
+2. Techniques related to the file format for handling nanopore data
+3. Deep learning related improvements
+4. Hardware Acceleration
+  
   </summary>
 
 1. Impact of lossy compression of nanopore raw signal data on basecalling and consensus accuracy
@@ -231,9 +236,22 @@ Acceleration of Slorado basecaller with memory utilization and algorithmic optim
 
 ### Experiment Setup and Implementation
 
+| GPU                 | NVIDIA GeForce RTX 3090 Ti               |
+|---------------------|------------------------------------------|
+| Version             | GPU + ONT’s close source koi library     |
+| Model               | Super Accuracy model                     |
+| Input dataset       | hg2_prom_lsk114_subsubsample/reads.blow5 |
+| No of entries       | 400                                      |
+| Size of the dataset | 1.5 GB                                   |
+
 Contiguous Memory Allocation of RNN Weights and matrix multiplication are the main bottlenecks.
 
 1. Optimizing Contiguous Memory Allocation of RNN Weights
+
+According to the previous code, Inside the forward() function, In each iteration of the for loop which iterates through the 5 RNN layers, it performs the contiguous memory allocation for the transposed weights. 
+But after the modifications at the first time that executes the forward function, it transposes the weights of all 5 layers and store them contiguously in a global array which has defined in another file globally. 
+After that in subsequent executions of the forward function, it uses the values stored in the array without performing any contiguous memory allocation. Also we have used standard container like torch tensors and standard vectors and memory reusing techniques for further improvements. Furthermore with this modification the contiguous operation happens only five time, but in the previous version it has happened more than seven hundred thousand times for the largest data set we used for testing.
+
 2. Optimizing Large matrix multiplication
 
 Winograd's matrix multiplication code was implemented in CUDA to replace current matrix multiplication function utilizing Cublas functions for basic matrix algebra kernels. The reason is to select winograd algorithm is the lowest time complexity it has among other matrix multiplication algorithms. 
@@ -285,7 +303,8 @@ C21=M1+M2+M4-M7, C22=M1+M2+M4+M5
 12) Free all allocated global memory
 </details>
 <details>
-  <summary> CUDA device functions for compute C11, C12, C21, C22 and C</summary>
+  <summary> CUDA device functions for compute C11, C12, C21, C22 and C
+  </summary>
 
 ``````
 __global__ void computeC12 (float* C, float* m1 ,float* m2 ,float* m5 ,float* m6 , int subWidth)
@@ -394,6 +413,7 @@ __global__ void mergeSubmatrices(float* submatrix0, float* submatrix1, float* su
     finalMatrix[(y + N) * M + x + N] = submatrix3[y * N + x];
 }
 ``````
+
 
 </details>
 
