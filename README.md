@@ -11,3 +11,15 @@ There are challenges in the data processing or the computational analysis side o
 ## Aim of the project:
 
 The proposed project aims to accelerate the nanopore super accuracy basecalling after identifying computational bottlenecks so that basecalling can be accelerated massively.
+
+## Developmemt environment
+
+GPU : NVIDIA GeForce RTX 3090 Ti
+
+Codebase : [Slorado git repository](#https://github.com/cepdnaclk/e17-slorado)
+(This includes the accelerated slorado basecalling implementation)
+
+
+
+
+
