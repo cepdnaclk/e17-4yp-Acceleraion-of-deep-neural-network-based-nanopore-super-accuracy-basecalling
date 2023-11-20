@@ -16,7 +16,7 @@ The proposed project aims to accelerate the nanopore super accuracy basecalling 
 
 GPU : NVIDIA GeForce RTX 3090 Ti
 
-Codebase : [Slorado git repository](#https://github.com/cepdnaclk/e17-slorado)
+Codebase : [Slorado git repository](https://github.com/cepdnaclk/e17-slorado)
 (This includes the accelerated slorado basecalling implementation)
 
 
